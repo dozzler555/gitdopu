@@ -12,7 +12,7 @@ env:
   GitHubName: "dozzler555" 
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-  IMAGE_NAME: vcom
+  IMAGE_NAME: vcom-dan
 
 jobs:
   build:
