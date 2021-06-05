@@ -10,6 +10,9 @@ env:
   # Change these values if you have forked it for your own works
   GitHubMail: "80205889+dozzler555@users.noreply.github.com"
   GitHubName: "dozzler555" 
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  IMAGE_NAME: vcom
 
 jobs:
   build:
@@ -17,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v2
 
       - name: Set Git Configs & Secrets
         run: |
@@ -26,13 +29,7 @@ jobs:
           git config --global credential.helper store
           echo "https://${GitHubName}:${{ secrets.GH_TOKEN }}@github.com" > ~/.git-credentials
 
-      # Cleanup The Actions Workspace Using Custom Composite Run Actions
-      - name: Log in to Docker Hub
-         uses: docker/login-action@v1
-         with:
-           username: ${{ secrets.DOCKER_USERNAME }}
-           password: ${{ secrets.DOCKER_PASSWORD }}
-         
+      
 
       - name: Clone The Secret Mirror Repository
         run: |
@@ -42,9 +39,8 @@ jobs:
         run: |
           cd source || exit 1
           docker container prune --force || true
-          docker build . --rm --force-rm --compress --no-cache=true --pull --file Dockerfile -t vcom
+          docker build . --rm --force-rm --compress --no-cache=true --tag $DOCKER_USERNAME/$IMAGE_NAME:latest --pull --file Dockerfile
           docker image ls
-          docker push brock5555/vcom
-      - name: Check out the repo
-        uses: actions/checkout@v2
+          echo "$DOCKERHUB_TOKEN" | docker login -u $DOCKER_USERNAME --password-stdin
+          docker push $DOCKER_USERNAME/$IMAGE_NAME:latest
       
